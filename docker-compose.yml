@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - app
+      - db
+
+  db:
+    image : mysql
+    container_name : mysql
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: example-app
+      MYSQL_ROOT_PASSWORD: password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "3400:80"
+    depends_on:
+      - db
+  app:
+    image: nginx:1.9
+    volumes:
+      - .:/usr/share/nginx/html/
+    expose:
+      - "80"
